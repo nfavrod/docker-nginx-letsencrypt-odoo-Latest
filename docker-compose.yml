@@ -1,5 +1,4 @@
-version: "2"
-
+version: "1"
 services:
   nginx:
     restart: always
@@ -37,33 +36,28 @@ services:
     environment:
       - NGINX_DOCKER_GEN_CONTAINER=nginx-gen
 
+
   web:
     restart: always
-    image: odoo:11
+    image: odoo:latest
     container_name: odoo
     depends_on:
       - db
     ports:
       - "8069:8069"
     volumes:
-      - odoo-web-data:/var/lib/odoo
-      - ./config:/etc/odoo
+      - data:/var/lib/odoo
+      - ./config:/etc/odoo_latest
       - ./addons:/mnt/extra-addons
-    environment:
-      - VIRTUAL_HOST=odoo, odoochat
-      - VIRTUAL_NETWORK=nginx-proxy
-      - VIRTUAL_PORT=8069, 8072
-      - LETSENCRYPT_HOST=samplewebsite.example.com
-      - LETSENCRYPT_EMAIL=test@example.com
+    env_file:
+      - stack.env
   db:
     restart: always
-    image: postgres:9.6
-    environment:
-      - POSTGRES_PASSWORD=sample_password
-      - POSTGRES_USER=sample_user
-      - PGDATA=/var/lib/postgresql/data/pgdata
+    image: postgres:15
+    env_file:
+      - stack.env
     volumes:
-      - odoo-db-data:/var/lib/postgresql/data/pgdata
+      - db:/var/lib/postgresql/data/pgdata 
 volumes:
-  odoo-web-data:
-  odoo-db-data:
+  data:
+  db:
